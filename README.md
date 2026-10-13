@@ -398,12 +398,14 @@ volta por callback, que o `Controller` reemite como signal Qt na thread da GUI.
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest
 ```
 
-**111 testes, ~17 s**, sem hardware: parser, simulador (incluindo `++eos` errado,
+**121 testes, ~28 s**, sem hardware: parser, simulador (incluindo `++eos` errado,
 endereço errado, erros, as duas esperas, abortar, NUMG, binário, SAVDASC), o
 ciclo **configura → dispara → lê → exporta** (CSV e Parquet com metadados),
 dielétrico recuperando o ε da amostra simulada, probe, fila e abortar do worker,
-`SerialLink` sobre `loop://`, e a janela inteira em modo offscreen (conectar,
-compensação, aquisição, dielétrico, exportação).
+`SerialLink` sobre `loop://`, a descoberta automática (porta muda, baud errado,
+porta trancada, firmware sem `++fndl`, barramento vazio, abortar) e a janela
+inteira em modo offscreen (conectar, compensação, aquisição, dielétrico,
+exportação).
 
 ## Windows
 
