@@ -251,7 +251,15 @@ Tudo o que a build precisa está em [`packaging/`](packaging/). **O passo final 
 roda no Windows**: PySide6 e o bootloader do PyInstaller são binários do alvo e
 não existe cross-compile a partir do Linux.
 
-Numa máquina Windows com Python 3.11+ e [Inno Setup 6](https://jrsoftware.org/isdl.php):
+**Pelo GitHub Actions** (sem máquina Windows à mão): o repositório já tem
+[`.github/workflows/windows.yml`](.github/workflows/windows.yml), que roda em
+`windows-latest` a cada push na `main` (ou sob demanda, em *Actions → Run
+workflow*): instala as dependências, roda a suíte, congela, abre o `.exe` uma
+vez para ver se a janela desenha, chama o Inno Setup e publica o instalador e a
+pasta portátil como artefatos do job. Uma tag `v*` vira release com o
+instalador anexado.
+
+**Na mão**, numa máquina Windows com Python 3.11+ e [Inno Setup 6](https://jrsoftware.org/isdl.php):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File packaging\build_windows.ps1
