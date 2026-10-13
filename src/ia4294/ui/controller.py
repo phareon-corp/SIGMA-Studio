@@ -132,8 +132,14 @@ class Controller(QObject):
         self.connection_changed.emit(connected, description or self.port_description)
 
     # ── conexão ─────────────────────────────────────────────────────────
+    def discover(self, on_done: Done | None = None, on_fail: Fail | None = None,
+                 deep: bool = False) -> None:
+        """Procura a interface e o instrumento; o resultado é um ``Discovery``."""
+        job = self.worker.discover(deep)
+        self._callbacks[job] = (on_done, on_fail)
+
     def connect_port(self, port: str, address: int, read_tmo_ms: int, sync: str,
-                     on_done: Done | None = None) -> None:
+                     on_done: Done | None = None, baudrate: int = 115200) -> None:
         self.simulated = port == "SIMULADOR"
         if self.simulated:
             from ..sim.ar488 import SimLink
@@ -145,7 +151,7 @@ class Controller(QObject):
             from ..transport.links import SerialLink
 
             self.sim_instrument = None
-            link = SerialLink(port)
+            link = SerialLink(port, baudrate)
         self.port_description = link.description
         self.set_capabilities(replace(self.caps, sync=sync))
         session = AR488Session(link, AR488Settings(address=address, read_tmo_ms=read_tmo_ms))

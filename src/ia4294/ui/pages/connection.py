@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QComboBox, QHBoxLayout, QPlainTextEdit, QScrollAre
 from ... import paths
 from ...instrument.capabilities import Capabilities
 from ...instrument.probe import probe
+from ...transport.discovery import BAUDS
 from ...transport.links import guess_ar488_port, list_serial_ports
 from .. import theme
 from ..controller import Controller
@@ -53,23 +54,36 @@ class ConnectionPage(QWidget):
         pw.setLayout(pr)
         pr.setContentsMargins(0, 0, 0, 0)
         form_row(g, 0, "Porta", pw)
+        self.baud = QComboBox()
+        for b in BAUDS:
+            self.baud.addItem(f"{b} 8N1", b)
+        form_row(g, 1, "Velocidade", self.baud)
         self.addr = QSpinBox()
         self.addr.setRange(0, 30)
         self.addr.setValue(17)
-        form_row(g, 1, "Endereço GPIB", self.addr, "++fndl acha")
+        form_row(g, 2, "Endereço GPIB", self.addr, "++fndl acha")
         self.tmo = QSpinBox()
         self.tmo.setRange(100, 32000)
         self.tmo.setSingleStep(500)
         self.tmo.setValue(3000)
         self.tmo.setSuffix(" ms")
-        form_row(g, 2, "++read_tmo_ms", self.tmo)
+        form_row(g, 3, "++read_tmo_ms", self.tmo)
         self.sync = QComboBox()
         for key, text in SYNC_OPTIONS:
             self.sync.addItem(text, key)
-        form_row(g, 3, "Espera da varredura", self.sync)
+        form_row(g, 4, "Espera da varredura", self.sync)
         left.body.addLayout(g)
+        self.detect_btn = button("Detectar", "primary")
+        self.detect_btn.setToolTip("Procura a interface AR488 nas portas USB, descobre a "
+                                   "velocidade e o endereço do instrumento, e conecta")
+        auto = QHBoxLayout()
+        auto.setSpacing(12)
+        auto.addWidget(self.detect_btn)
+        auto.addWidget(label("acha a porta, a velocidade e o endereço sozinho", "meta",
+                             theme.body_font(12), wrap=True), 1)
+        left.body.addLayout(auto)
         btns = QHBoxLayout()
-        self.connect_btn = button("Conectar", "primary")
+        self.connect_btn = button("Conectar")
         self.idn_btn = button("Testar *IDN?")
         btns.addWidget(self.connect_btn)
         btns.addWidget(self.idn_btn)
@@ -110,6 +124,7 @@ class ConnectionPage(QWidget):
 
         # sinais
         self.refresh_btn.clicked.connect(self.refresh_ports)
+        self.detect_btn.clicked.connect(self.detect)
         self.connect_btn.clicked.connect(self.toggle_connection)
         self.idn_btn.clicked.connect(self.test_idn)
         self.probe_btn.clicked.connect(self.run_probe)
@@ -120,6 +135,8 @@ class ConnectionPage(QWidget):
         self.settings = QSettings("ia4294", "ia4294")
         self.addr.setValue(int(self.settings.value("gpib/address", 17)))
         self.tmo.setValue(int(self.settings.value("gpib/read_tmo_ms", 3000)))
+        salvo = int(self.settings.value("gpib/baudrate", BAUDS[0]))
+        self.baud.setCurrentIndex(max(0, self.baud.findData(salvo)))
         self.refresh_ports()
         last = self.settings.value("gpib/port", "")
         if last and self.port.findText(last) >= 0:
@@ -143,6 +160,54 @@ class ConnectionPage(QWidget):
         else:
             self.port.setCurrentText(SIM if not ports else ports[0])
 
+    def detect(self) -> None:
+        """Acha a interface, a velocidade e o endereço — e conecta no que achou.
+
+        O trabalho é todo da thread da porta; aqui só se mostra o andamento e
+        se preenche o formulário com o que voltou.
+        """
+        self.kv.set("Estado", "procurando a interface nas portas USB…")
+
+        def andamento(_frac: float, msg: str) -> None:
+            if msg:
+                self.kv.set("Estado", f"procurando… {msg}")
+
+        def done(found) -> None:
+            self.ctl.progress.disconnect(andamento)
+            self.show_discovery(found)
+            if not found.ok:
+                return
+            self.port.setCurrentText(found.port)
+            self.baud.setCurrentIndex(max(0, self.baud.findData(found.baudrate)))
+            alvo = found.target
+            if alvo is not None:
+                self.addr.setValue(alvo.address)
+            self.refresh_ports()
+            self.port.setCurrentText(found.port)
+            if alvo is not None and not self.ctl.connected:
+                self.toggle_connection()  # achou instrumento: conecta no que achou
+
+        def fail(err: str, _aborted: bool) -> None:
+            self.ctl.progress.disconnect(andamento)
+            self.kv.set("Estado", f"a procura falhou: {err}")
+
+        self.ctl.progress.connect(andamento)
+        self.ctl.discover(done, fail)
+
+    def show_discovery(self, found) -> None:
+        """O resultado da procura na ficha da interface, com o motivo quando falha."""
+        self.kv.set("Estado", found.summary())
+        if found.ok:
+            self.kv.set("Porta", f"{found.port} · {found.baudrate} {found.framing}")
+            self.kv.set("Firmware AR488", found.firmware)
+            if found.devices:
+                self.kv.set("Barramento", " · ".join(d.text() for d in found.devices))
+        else:
+            portas = ", ".join(found.scanned) or "nenhuma"
+            self.kv.set("Portas tentadas", portas)
+        if found.notes:
+            self.ctl.status.emit("erro" if not found.ok else "info", found.notes[-1])
+
     def toggle_connection(self) -> None:
         if self.ctl.connected:
             self.ctl.disconnect_port()
@@ -151,9 +216,10 @@ class ConnectionPage(QWidget):
         self.settings.setValue("gpib/port", port)
         self.settings.setValue("gpib/address", self.addr.value())
         self.settings.setValue("gpib/read_tmo_ms", self.tmo.value())
+        self.settings.setValue("gpib/baudrate", self.baud.currentData())
         self.kv.set("Estado", "abrindo porta, aguardando reset da placa…")
         self.ctl.connect_port(port, self.addr.value(), self.tmo.value(), self.sync.currentData(),
-                              on_done=lambda _v: self.test_idn())
+                              on_done=lambda _v: self.test_idn(), baudrate=self.baud.currentData())
 
     def test_idn(self) -> None:
         def job(ctx):
@@ -240,7 +306,9 @@ class ConnectionPage(QWidget):
     def _enable(self) -> None:
         busy, conn = self.ctl.busy, self.ctl.connected
         self.connect_btn.setEnabled(not busy or conn)
-        for w in (self.port, self.addr, self.tmo, self.sync, self.refresh_btn):
+        # procurar abre e fecha portas por conta própria: só com a porta livre
+        self.detect_btn.setEnabled(not busy and not conn)
+        for w in (self.port, self.baud, self.addr, self.tmo, self.sync, self.refresh_btn):
             w.setEnabled(not conn and not busy)
         self.idn_btn.setEnabled(conn and not busy)
         self.probe_btn.setEnabled(conn and not busy)

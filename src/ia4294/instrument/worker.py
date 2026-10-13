@@ -19,6 +19,7 @@ from .capabilities import Capabilities
 from .hp4294a import HP4294A, Aborted
 from ..model.sweep import SweepTimer
 from ..transport.ar488 import AR488Session
+from ..transport.discovery import Discovery, discover
 from ..transport.traffic import NOTE, TrafficLog
 
 
@@ -123,6 +124,16 @@ class PortWorker:
             return session.version
 
         return self.submit("conectar", job)
+
+    def discover(self, deep: bool = False) -> int:
+        """Varre portas e endereços. Fecha a conexão antes: a porta é uma só."""
+
+        def job(ctx: JobContext) -> Discovery:
+            self._close()
+            return discover(traffic=self.traffic, progress=ctx.progress, deep=deep,
+                            should_abort=lambda: ctx.abort.is_set())
+
+        return self.submit("procurar interface", job)
 
     def disconnect(self) -> int:
         def job(ctx: JobContext) -> None:
