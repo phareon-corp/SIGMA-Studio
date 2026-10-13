@@ -1,0 +1,62 @@
+/* ═══════════════════════════════════════════════════════════════
+   PHAREON — DESIGN TOKENS
+   Fonte da verdade. Extraído de ../../Site/site.html (v.2026.01).
+   Qualquer mudança de token começa AQUI e desce para o site.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root{
+  /* ─── SUPERFÍCIES ─────────────────────────────────────────── */
+  --bg:           #08080B;   /* fundo primário — "câmara escura" */
+  --bg-2:         #0E0E12;   /* faixas, hover de step, marquee   */
+  --bg-3:         #14141A;   /* hover de métrica                 */
+  --bg-light:     #EFECE4;   /* inversão: capabilities, cases    */
+  --bg-light-2:   #E5E1D7;   /* hover no claro                   */
+
+  /* ─── TINTA SOBRE ESCURO ──────────────────────────────────── */
+  --ink:          #F4F1E9;   /* texto primário                   */
+  --ink-dim:      #A8A39A;   /* texto secundário / corpo         */
+  --ink-faint:    #5C594F;   /* metadados, mono, legendas        */
+
+  /* ─── TINTA SOBRE CLARO ───────────────────────────────────── */
+  --ink-dark:     #0A0A0D;
+  --ink-dark-2:   #2A2823;
+  --ink-dark-3:   #6F6B5F;
+
+  /* ─── ACENTO ──────────────────────────────────────────────── */
+  --accent:       #FF4A1C;              /* laser orange — a marca */
+  --accent-glow:  #FF6B3D;              /* hover / brilho         */
+  --accent-soft:  rgba(255,74,28,.12);  /* halo, wash             */
+
+  --beam:         #4FE0FF;              /* cyan — reservado, ADR-002 */
+  --beam-soft:    rgba(79,224,255,.15);
+
+  /* segunda chapa — só terreno claro. Ver ADR-003. */
+  --cobalt:       #1B4B8F;              /* matéria, nunca sinal   */
+  --overprint:    #1B1610;              /* terracota × cobalto    */
+
+  /* ─── LINHAS ──────────────────────────────────────────────── */
+  --line:              rgba(244,241,233,.08);
+  --line-mid:          rgba(244,241,233,.13);  /* trama de fundo */
+  --line-strong:       rgba(244,241,233,.18);
+  --line-dark:         rgba(10,10,13,.10);
+  --line-dark-mid:     rgba(10,10,13,.15);     /* trama, terreno claro */
+  --line-dark-strong:  rgba(10,10,13,.20);
+
+  /* ─── TIPOGRAFIA ──────────────────────────────────────────── */
+  --f-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --f-body:    'Geist', system-ui, sans-serif;
+  --f-mono:    'Geist Mono', 'JetBrains Mono', monospace;
+  --f-serif:   'Instrument Serif', Georgia, serif;
+
+  /* ─── ESPAÇO / RITMO ──────────────────────────────────────── */
+  --max-w:      1320px;
+  --pad-x:      clamp(20px, 4vw, 56px);
+  --section-py: clamp(100px, 12vw, 180px);
+
+  /* ─── MOVIMENTO ───────────────────────────────────────────── */
+  --ease:     cubic-bezier(.2,.8,.2,1);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+}
+
+@media (max-width:1024px){ :root{ --section-py: clamp(80px,10vw,140px) } }
+@media (max-width:380px){  :root{ --pad-x: 18px } }

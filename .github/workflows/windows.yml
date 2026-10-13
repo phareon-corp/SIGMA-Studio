@@ -1,0 +1,82 @@
+name: Windows — executável e instalador
+
+# Compila o que não dá para compilar no Linux: PySide6 e o bootloader do
+# PyInstaller são binários do alvo. O runner windows-latest faz o papel da
+# máquina Windows que packaging/build_windows.ps1 espera.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write  # só o passo de release usa; os outros não escrevem nada
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Dependências
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install -e ".[dev,build]"
+
+      - name: Suíte (offscreen)
+        env:
+          QT_QPA_PLATFORM: offscreen
+          IA4294_REDUCED_MOTION: "1"
+        run: python -m pytest -q
+
+      - name: Ícone
+        run: python packaging/make_icon.py
+
+      - name: Congelar com o PyInstaller
+        run: python -m PyInstaller --noconfirm packaging/ia4294.spec
+
+      - name: Fumaça — o .exe abre, desenha e fecha
+        env:
+          QT_QPA_PLATFORM: offscreen
+          IA4294_REDUCED_MOTION: "1"
+        run: |
+          dist\ia4294\ia4294.exe --sim --sim-speed 0.02 --size 1320x860 --screenshot dist\fumaca.png
+          if (-not (Test-Path dist\fumaca.png)) { throw "a janela não desenhou" }
+
+      - name: Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Instalador
+        run: & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" packaging\ia4294.iss
+
+      - name: Artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: ia4294-windows
+          path: |
+            dist/ia4294-*-setup.exe
+            dist/fumaca.png
+          if-no-files-found: error
+
+      - name: Pasta portátil
+        uses: actions/upload-artifact@v4
+        with:
+          name: ia4294-windows-portatil
+          path: dist/ia4294/
+          if-no-files-found: error
+
+      # tag v* vira release com o instalador anexado
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" (Get-Item dist\ia4294-*-setup.exe).FullName --generate-notes --title "ia4294 ${{ github.ref_name }}"

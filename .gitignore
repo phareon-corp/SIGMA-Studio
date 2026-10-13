@@ -1,0 +1,19 @@
+# ambientes
+.venv/
+.venv-win/
+
+# build
+build/
+dist/
+*.egg-info/
+# gerado por packaging/make_icon.py a cada build
+packaging/ia4294.ico
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# saídas do app (quando rodado dentro do projeto)
+*.log
+*.parquet
