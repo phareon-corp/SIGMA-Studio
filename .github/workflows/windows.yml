@@ -49,7 +49,14 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           IA4294_REDUCED_MOTION: "1"
         run: |
-          dist\sigma-studio\sigma-studio.exe --sim --sim-speed 0.02 --size 1320x860 --screenshot dist\fumaca.png
+          # .exe sem console devolve o prompt na hora: sem WaitForExit, o teste
+          # olharia o arquivo antes de a janela existir
+          $args = "--sim","--sim-speed","0.02","--size","1320x860","--screenshot","dist\fumaca.png"
+          $p = Start-Process -FilePath dist\sigma-studio\sigma-studio.exe -ArgumentList $args -PassThru `
+               -RedirectStandardOutput dist\fumaca.out -RedirectStandardError dist\fumaca.err
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); throw "o executável não fechou sozinho" }
+          Get-Content dist\fumaca.out, dist\fumaca.err -ErrorAction SilentlyContinue
+          if ($p.ExitCode -ne 0) { throw "o executável saiu com código $($p.ExitCode)" }
           if (-not (Test-Path dist\fumaca.png)) { throw "a janela não desenhou" }
 
       - name: Inno Setup
@@ -82,4 +89,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $pacote = (Get-Item dist\sigma-studio-*-windows-setup.exe).FullName
-          gh release create "${{ github.ref_name }}" $pacote --generate-notes --title "SIGMA Studio ${{ github.ref_name }}"
+          # a release pode já existir (criada pelo pacote do Linux, que sai daqui de fora)
+          gh release view "${{ github.ref_name }}" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create "${{ github.ref_name }}" --generate-notes --title "SIGMA Studio ${{ github.ref_name }}"
+          }
+          gh release upload "${{ github.ref_name }}" $pacote --clobber
