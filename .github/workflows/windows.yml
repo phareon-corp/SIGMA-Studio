@@ -42,14 +42,14 @@ jobs:
         run: python packaging/make_icon.py
 
       - name: Congelar com o PyInstaller
-        run: python -m PyInstaller --noconfirm packaging/ia4294.spec
+        run: python -m PyInstaller --noconfirm packaging/sigma-studio.spec
 
       - name: Fumaça — o .exe abre, desenha e fecha
         env:
           QT_QPA_PLATFORM: offscreen
           IA4294_REDUCED_MOTION: "1"
         run: |
-          dist\ia4294\ia4294.exe --sim --sim-speed 0.02 --size 1320x860 --screenshot dist\fumaca.png
+          dist\sigma-studio\sigma-studio.exe --sim --sim-speed 0.02 --size 1320x860 --screenshot dist\fumaca.png
           if (-not (Test-Path dist\fumaca.png)) { throw "a janela não desenhou" }
 
       - name: Inno Setup
@@ -57,22 +57,22 @@ jobs:
 
       - name: Instalador
         run: |
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" packaging\ia4294.iss
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" packaging\sigma-studio.iss
 
       - name: Artefatos
         uses: actions/upload-artifact@v4
         with:
-          name: ia4294-windows
+          name: sigma-studio-windows
           path: |
-            dist/ia4294-*-setup.exe
+            dist/sigma-studio-*-windows-setup.exe
             dist/fumaca.png
           if-no-files-found: error
 
       - name: Pasta portátil
         uses: actions/upload-artifact@v4
         with:
-          name: ia4294-windows-portatil
-          path: dist/ia4294/
+          name: sigma-studio-windows-portatil
+          path: dist/sigma-studio/
           if-no-files-found: error
 
       # tag v* vira release com o instalador anexado
@@ -81,5 +81,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $pacote = (Get-Item dist\ia4294-*-setup.exe).FullName
-          gh release create "${{ github.ref_name }}" $pacote --generate-notes --title "ia4294 ${{ github.ref_name }}"
+          $pacote = (Get-Item dist\sigma-studio-*-windows-setup.exe).FullName
+          gh release create "${{ github.ref_name }}" $pacote --generate-notes --title "SIGMA Studio ${{ github.ref_name }}"

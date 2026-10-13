@@ -148,7 +148,7 @@ def probe(session: AR488Session, report: Report = print,
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="ia4294-probe", description=__doc__,
+    ap = argparse.ArgumentParser(prog="sigma-studio-probe", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--port", default=None,
                     help="porta serial; sem isto procura a interface (COM* ou /dev/ttyACM*)")

@@ -1,4 +1,4 @@
-"""ia4294 — abre a janela. ``python -m ia4294 --sim`` conecta direto no simulador."""
+"""SIGMA Studio — abre a janela. ``python -m ia4294 --sim`` conecta no simulador."""
 
 from __future__ import annotations
 
@@ -6,9 +6,11 @@ import argparse
 import os
 import sys
 
+from . import APP_NAME, APP_SLUG
+
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="ia4294")
+    ap = argparse.ArgumentParser(prog=APP_SLUG)
     ap.add_argument("--sim", action="store_true", help="conecta no simulador ao abrir")
     ap.add_argument("--sim-speed", type=float, default=0.1,
                     help="escala de tempo do simulador (1 = tempo real estimado)")
@@ -28,7 +30,8 @@ def main(argv: list[str] | None = None) -> int:
     from .ui.main_window import MainWindow
 
     app = QApplication(sys.argv[:1])
-    app.setApplicationName("ia4294")
+    app.setApplicationName(APP_NAME)
+    app.setOrganizationName("Phareon")
     app.setStyle("Fusion")
     # o terreno antes do QSS: a folha nasce com as cores já resolvidas
     pref = args.tema or os.environ.get("IA4294_TERRENO") \

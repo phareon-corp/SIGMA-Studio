@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget,
 )
 
-from .. import __version__
+from .. import APP_NAME, __version__
 from ..model.sweep import CompensationState
 from . import theme
 from .controller import Controller
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
     def __init__(self, ctl: Controller) -> None:
         super().__init__()
         self.ctl = ctl
-        self.setWindowTitle("ia4294 — HP 4294A")
+        self.setWindowTitle(f"{APP_NAME} — HP 4294A")
         self.setWindowIcon(app_icon())
         self.setMinimumSize(960, 600)
         screen = QApplication.primaryScreen()
@@ -138,7 +138,7 @@ class MainWindow(QMainWindow):
         tl.setSpacing(2)
         self.source_dot = Dot(6, on=True)
         tl.addWidget(self.source_dot)
-        tl.addWidget(mono_label("ia4294", 11, 0.24, "value"))
+        tl.addWidget(mono_label(APP_NAME, 11, 0.24, "value"))
         tl.addSpacing(18)
         tl.addWidget(mono_label("HP 4294A · 16451B · AR488", 10, 0.18))
         tl.addStretch(1)

@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ia4294"
+name = "sigma-studio"
 version = "0.1.0"
-description = "Controle e aquisição do analisador de impedância HP/Agilent 4294A via AR488 (GPIB-USB)"
+description = "SIGMA Studio — controle e aquisição do analisador de impedância HP/Agilent 4294A via AR488 (GPIB-USB)"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -22,10 +22,12 @@ dev = ["pytest>=8"]
 build = ["pyinstaller>=6.6"]  # empacotamento Windows; ver packaging/
 
 [project.scripts]
-ia4294-probe = "ia4294.instrument.probe:main"
+sigma-studio-probe = "ia4294.instrument.probe:main"
+ia4294-probe = "ia4294.instrument.probe:main"  # nome antigo, mantido
 
 [project.gui-scripts]
-ia4294 = "ia4294.__main__:main"
+sigma-studio = "ia4294.__main__:main"
+ia4294 = "ia4294.__main__:main"  # nome antigo, mantido
 
 [tool.setuptools.packages.find]
 where = ["src"]

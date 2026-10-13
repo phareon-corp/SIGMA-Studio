@@ -1,4 +1,7 @@
-"""Gera packaging/ia4294.ico a partir do logo-mark desenhado em ui/main_window.
+"""Gera os ícones do SIGMA Studio a partir do logo-mark desenhado em ui/main_window.
+
+``sigma-studio.ico`` para o Windows e ``sigma-studio.png`` (256) para o .desktop
+do Linux.
 
 O ícone não é arquivo de arte: é o mesmo gradiente radial que a janela usa,
 então muda junto com os tokens. Roda sem tela (QT_QPA_PLATFORM=offscreen).
@@ -53,9 +56,13 @@ def main() -> int:
         icon.pixmap(QSize(size, size)).toImage().save(buf, "PNG")
         pngs.append(bytes(buf.data()))
 
-    out = HERE / "ia4294.ico"
+    out = HERE / "sigma-studio.ico"
     out.write_bytes(ico(pngs, SIZES))
     print(f"{out} — {len(SIZES)} tamanhos, {out.stat().st_size} bytes")
+
+    png = HERE / "sigma-studio.png"  # o .desktop do Linux quer PNG
+    png.write_bytes(pngs[SIZES.index(256)])
+    print(f"{png} — 256×256, {png.stat().st_size} bytes")
     return 0
 
 

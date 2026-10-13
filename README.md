@@ -1,4 +1,8 @@
-# ia4294
+# SIGMA Studio
+
+> Antes `ia4294`. O pacote Python, o diretório de configuração e os metadados
+> dos arquivos exportados continuam com o nome antigo — a instalação de quem já
+> usa não muda de lugar.
 
 Aplicativo de bancada para controlar e coletar dados do **HP/Agilent 4294A**
 (fixture dielétrica **16451B**) através da interface GPIB-USB caseira **AR488
@@ -17,6 +21,21 @@ vem de lá e está embutido aqui:
 
 ## Instalar
 
+**Pacote pronto** (não precisa de Python nem de venv) — em
+[Releases](https://github.com/phareon-corp/SIGMA-Studio/releases):
+
+```bash
+# Linux x86_64
+tar xzf sigma-studio-0.1.0-linux-x86_64.tar.gz
+sigma-studio-0.1.0-linux-x86_64/instalar.sh     # ~/.local, sem root, cria o atalho
+```
+
+No Windows, `sigma-studio-0.1.0-windows-setup.exe` (instalação por usuário, sem
+UAC). Para desinstalar no Linux, `desinstalar.sh` do mesmo pacote — ele não
+toca em configuração nem nos dados exportados.
+
+**Do código**, para desenvolver:
+
 ```bash
 cd ~/Downloads/Softwares/4294A\ Agilent/ia4294
 python3 -m venv .venv
@@ -29,12 +48,12 @@ logout/login depois do `usermod`).
 ## Usar
 
 ```bash
-.venv/bin/ia4294                 # abre a janela
-.venv/bin/ia4294 --sim           # já conecta no simulador
-.venv/bin/ia4294 --sim --sim-speed 1   # simulador com tempos de varredura reais
-.venv/bin/ia4294-probe           # descobre comandos de array no 4294A real
-.venv/bin/ia4294-probe --sim     # o mesmo, no simulador
-.venv/bin/ia4294 --tema escuro   # abre no terreno escuro (claro | escuro | sistema)
+.venv/bin/sigma-studio                 # abre a janela
+.venv/bin/sigma-studio --sim           # já conecta no simulador
+.venv/bin/sigma-studio --sim --sim-speed 1   # simulador com tempos de varredura reais
+.venv/bin/sigma-studio-probe           # descobre comandos de array no 4294A real
+.venv/bin/sigma-studio-probe --sim     # o mesmo, no simulador
+.venv/bin/sigma-studio --tema escuro   # abre no terreno escuro (claro | escuro | sistema)
 ```
 
 Atalhos: `Ctrl+1`…`Ctrl+6` trocam de aba; `Ctrl+T` troca o terreno; `Esc` aborta
@@ -109,7 +128,7 @@ simulador, que reproduz o AR488 (inclusive o silêncio com `++eos ≠ 2`) e um
 ### Por que o probe existe
 
 Os comandos de transferência de array estão no Programming Manual, que não
-temos. O `ia4294-probe` (ou o botão na aba Conexão):
+temos. O `sigma-studio-probe` (ou o botão na aba Conexão):
 
 1. configura uma varredura conhecida (LIN, 1 kHz – 1 MHz, 11 pontos). **Isso
    muda o estado do instrumento:** reaplique o perfil depois;
@@ -245,7 +264,22 @@ Onde o app escreve, por sistema:
 | log de tráfego | `~/.local/state/ia4294/logs` | `%LOCALAPPDATA%\ia4294\logs` |
 | dados exportados | `~/Documentos/ia4294` | `%USERPROFILE%\Documents\ia4294` |
 
-### Gerar o executável e o instalador
+## Empacotar
+
+### Gerar o pacote do Linux
+
+```bash
+packaging/build_linux.sh          # --sem-testes pula a suíte
+```
+
+Congela com o PyInstaller, abre o binário uma vez no simulador para ver se a
+janela desenha e empacota tudo em `dist/sigma-studio-<versão>-linux-x86_64.tar.gz`
+(~158 MB) com `instalar.sh`, `desinstalar.sh` e o ícone. A instalação é por
+usuário: `~/.local/share/sigma-studio`, link em `~/.local/bin` e um `.desktop`
+em `~/.local/share/applications`. Nada de root — o que falta para a porta serial
+é o grupo `dialout`, e o instalador avisa se você não estiver nele.
+
+### Gerar o executável e o instalador do Windows
 
 Tudo o que a build precisa está em [`packaging/`](packaging/). **O passo final só
 roda no Windows**: PySide6 e o bootloader do PyInstaller são binários do alvo e
@@ -269,16 +303,16 @@ O script cria `.venv-win`, instala as dependências, **roda a suíte**, gera o
 ícone, congela com o PyInstaller, abre o `.exe` uma vez no simulador para ver se
 a janela desenha e chama o Inno Setup. Sai:
 
-- `dist\ia4294\` — pasta portátil (~430 MB; `pyarrow`, que só serve ao export
+- `dist\sigma-studio\` — pasta portátil (~430 MB; `pyarrow`, que só serve ao export
   Parquet, é um terço disso);
-- `dist\ia4294-0.1.0-setup.exe` — instalador por usuário, sem UAC, com atalho no
+- `dist\sigma-studio-0.1.0-windows-setup.exe` — instalador por usuário, sem UAC, com atalho no
   menu Iniciar (um deles abre direto no simulador) e desinstalador.
 
 `-Portable` para só a pasta, `-SkipTests` para pular a suíte.
 
-Os arquivos: [`ia4294.spec`](packaging/ia4294.spec) (one-dir, sem console, sem
+Os arquivos: [`sigma-studio.spec`](packaging/sigma-studio.spec) (one-dir, sem console, sem
 UPX — UPX em DLL do Qt vira falso positivo de antivírus), [`launcher.py`](packaging/launcher.py),
-[`ia4294.iss`](packaging/ia4294.iss) e [`make_icon.py`](packaging/make_icon.py),
+[`sigma-studio.iss`](packaging/sigma-studio.iss) e [`make_icon.py`](packaging/make_icon.py),
 que monta o `.ico` de 7 tamanhos a partir do mesmo logo-mark que a janela desenha.
 
 ## Design

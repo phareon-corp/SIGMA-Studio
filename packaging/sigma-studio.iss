@@ -1,15 +1,16 @@
-; Inno Setup 6 — instalador do ia4294 para Windows 10/11 64 bits.
+; Inno Setup 6 — instalador do SIGMA Studio para Windows 10/11 64 bits.
 ;
-;   iscc packaging\ia4294.iss
+;   iscc packaging\sigma-studio.iss
 ;
-; Espera dist\ia4294\ pronto (packaging\build_windows.ps1 faz os dois passos).
+; Espera dist\sigma-studio\ pronto (packaging\build_windows.ps1 faz os dois passos).
 ; Instala por usuário (sem UAC): a bancada costuma rodar com conta sem
 ; privilégio, e o app só precisa da porta COM, que não pede administrador.
 
-#define AppName "ia4294"
+#define AppName "SIGMA Studio"
 #define AppVersion "0.1.0"
+#define AppSlug "sigma-studio"
 #define AppPublisher "Phareon"
-#define AppExe "ia4294.exe"
+#define AppExe "sigma-studio.exe"
 
 [Setup]
 AppId={{7A4294A0-16451-4B29-9A42-94A16451B000}
@@ -25,8 +26,8 @@ PrivilegesRequiredOverridesAllowed=dialog
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\dist
-OutputBaseFilename=ia4294-{#AppVersion}-setup
-SetupIconFile=ia4294.ico
+OutputBaseFilename={#AppSlug}-{#AppVersion}-windows-setup
+SetupIconFile=sigma-studio.ico
 UninstallDisplayIcon={app}\{#AppExe}
 Compression=lzma2/max
 SolidCompression=yes
@@ -42,7 +43,7 @@ Name: "desktopicon"; Description: "Criar atalho na área de trabalho"; GroupDesc
 
 [Files]
 ; a pasta inteira que o PyInstaller gerou
-Source: "..\dist\ia4294\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\{#AppSlug}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"

@@ -6,8 +6,7 @@
 build/
 dist/
 *.egg-info/
-# gerado por packaging/make_icon.py a cada build
-packaging/ia4294.ico
+# gerados por packaging/make_icon.py a cada build
 
 # python
 __pycache__/
@@ -17,3 +16,5 @@ __pycache__/
 # saídas do app (quando rodado dentro do projeto)
 *.log
 *.parquet
+packaging/sigma-studio.ico
+packaging/sigma-studio.png

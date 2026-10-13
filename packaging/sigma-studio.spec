@@ -1,11 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller: ia4294 em pasta única (one-dir), sem console.
+"""PyInstaller: SIGMA Studio em pasta única (one-dir), sem console.
 
 Roda no Windows, com o venv do projeto ativo:
 
-    pyinstaller --noconfirm packaging/ia4294.spec
+    pyinstaller --noconfirm packaging/sigma-studio.spec
 
-Sai em ``dist/ia4294/``, que é o que o Inno Setup empacota. One-dir e não
+Sai em ``dist/sigma-studio/``, que é o que o Inno Setup empacota. One-dir e não
 one-file porque o one-file descompacta tudo no %TEMP% a cada abertura — num
 app que fica aberto o dia inteiro na bancada isso só atrasa o primeiro uso e
 confunde o antivírus.
@@ -18,7 +18,7 @@ from PyInstaller.utils.hooks import collect_submodules
 SPEC_DIR = Path(SPECPATH).resolve()
 ROOT = SPEC_DIR.parent
 ASSETS = ROOT / "src" / "ia4294" / "ui" / "assets"
-ICON = SPEC_DIR / "ia4294.ico"
+ICON = SPEC_DIR / "sigma-studio.ico"
 
 datas = [
     (str(ASSETS / "phareon-tokens.css"), "ia4294/ui/assets"),
@@ -62,7 +62,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="ia4294",
+    name="sigma-studio",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -83,5 +83,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name="ia4294",
+    name="sigma-studio",
 )
