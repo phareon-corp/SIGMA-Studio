@@ -8,6 +8,15 @@ version = "0.1.0"
 description = "SIGMA Studio — controle e aquisição do analisador de impedância HP/Agilent 4294A via AR488 (GPIB-USB)"
 readme = "README.md"
 requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Environment :: X11 Applications :: Qt",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Topic :: Scientific/Engineering",
+  "Natural Language :: Portuguese (Brazilian)",
+]
 dependencies = [
   "PySide6>=6.6",
   "pyqtgraph>=0.13.4",
@@ -16,6 +25,11 @@ dependencies = [
   "pandas>=2.1",
   "pyarrow>=14",
 ]
+
+[project.urls]
+Homepage = "https://github.com/phareon-corp/SIGMA-Studio"
+Repository = "https://github.com/phareon-corp/SIGMA-Studio"
+Issues = "https://github.com/phareon-corp/SIGMA-Studio/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
