@@ -12,11 +12,9 @@ num Arduino Mega 2560**. Desktop, PySide6 + pyqtgraph. Nada de web.
 
 ## Estado
 
-- O app **ainda não rodou contra o 4294A real**: tudo foi exercitado contra o
-  simulador embutido, que roda sem instrumento nenhum (`--sim`).
-- Por isso os comandos de transferência de array são convenção até o
-  `sigma-studio-probe` confirmá-los na primeira conexão real — veja
-  [O que é certo e o que é convenção](#o-que-é-certo-e-o-que-é-convenção).
+- **Testado e aprovado** (novembro de 2026) na bancada, com o 4294A real, e
+  contra o simulador embutido, que roda sem instrumento nenhum (`--sim`).
+- Licença do código: **Apache-2.0** ([`LICENSE`](LICENSE)).
 - Versão publicada: **v0.1.0**, com instalador de Linux e de Windows em
   [Releases](https://github.com/phareon-corp/SIGMA-Studio/releases).
 
@@ -24,7 +22,23 @@ num Arduino Mega 2560**. Desktop, PySide6 + pyqtgraph. Nada de web.
 |---|---|
 | Aquisição, terreno **claro** — o padrão | a mesma tela no terreno **escuro** |
 
-As seis páginas nos dois terrenos estão em [`docs/img/`](docs/img/).
+### Capturas de tela
+
+<table>
+<tr>
+<td align="center"><a href="docs/img/tela-1-claro.png"><img src="docs/img/tela-1-claro.png" alt="Conexão" width="300"></a><br><sub>01 Conexão</sub></td>
+<td align="center"><a href="docs/img/tela-2-claro.png"><img src="docs/img/tela-2-claro.png" alt="Medida" width="300"></a><br><sub>02 Medida</sub></td>
+<td align="center"><a href="docs/img/tela-3-claro.png"><img src="docs/img/tela-3-claro.png" alt="Calibração" width="300"></a><br><sub>03 Calibração</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="docs/img/tela-4-claro.png"><img src="docs/img/tela-4-claro.png" alt="Aquisição" width="300"></a><br><sub>04 Aquisição</sub></td>
+<td align="center"><a href="docs/img/tela-5-claro.png"><img src="docs/img/tela-5-claro.png" alt="Dielétrico" width="300"></a><br><sub>05 Dielétrico</sub></td>
+<td align="center"><a href="docs/img/tela-6-claro.png"><img src="docs/img/tela-6-claro.png" alt="Log" width="300"></a><br><sub>06 Log</sub></td>
+</tr>
+</table>
+
+As seis páginas nos dois terrenos estão em [`docs/img/`](docs/img/), geradas
+pelo próprio programa contra o simulador (`--sim --acquire --screenshot`).
 
 O hardware tem documentação própria, no repositório do firmware AR488 para
 Arduino Mega 2560 — **material do autor, ainda não publicado**. O que vem de lá
@@ -233,8 +247,8 @@ andamento na tela e `Esc` para abortar.
 
 ## O que é certo e o que é convenção
 
-O app **ainda não rodou contra o 4294A real**. Tudo foi exercitado contra o
-simulador, que reproduz o AR488 (inclusive o silêncio com `++eos ≠ 2`) e um
+O app foi **testado e aprovado com o 4294A real**. Antes disso, tudo foi
+exercitado contra o simulador, que reproduz o AR488 (inclusive o silêncio com `++eos ≠ 2`) e um
 4294A com fila de erros, status byte, tempos de varredura e SAVDASC.
 
 | Item | Origem | Confiança |
@@ -242,8 +256,8 @@ simulador, que reproduz o AR488 (inclusive o silêncio com `++eos ≠ 2`) e um
 | Mnemônicos de configuração (MEAS, SWPT, BWFACT, COMA…), lista de MEAS, códigos de erro, `OUTPERRO?` devolvendo 0 | Operation Manual do 4294A, peça **9018-40474** — documento da Agilent, **não incluído no repositório** | alta |
 | Inversão de teclas do 16451B no caminho LOAD | Operation Manual, "Fixture Compensation When the 16451B is Used" | alta |
 | Formato do arquivo ASCII (SAVDASC) | Operation Manual, Tabela 8-5 (mesmo documento, externo) | alta |
-| `OUTPDTRC?`, `OUTPDATA?`, `OUTPSWPRM?`, `FORM2/3/4/5` | convenção HP (família 8753/4395); o Programming Manual não está aqui | **verificar com o probe** |
-| Espera por `*OPC` + `++spoll` (bit ESB) ou por `*OPC?` | IEEE 488.2 | **verificar com o probe** |
+| `OUTPDTRC?`, `OUTPDATA?`, `OUTPSWPRM?`, `FORM2/3/4/5` | convenção HP (família 8753/4395); o Programming Manual não está aqui | **conferido no 4294A real** |
+| Espera por `*OPC` + `++spoll` (bit ESB) ou por `*OPC?` | IEEE 488.2 | **conferido no 4294A real** |
 
 ### Por que o probe existe
 
@@ -531,5 +545,7 @@ reemite a folha, refaz o ícone e chama `restyle()` em todo widget que tiver um
   todas sob **SIL Open Font License**, com as licenças incluídas em
   [`src/ia4294/ui/assets/fonts/`](src/ia4294/ui/assets/fonts/).
 
-**A licença do código deste repositório ainda não foi definida.** Até que
-seja, vale o padrão legal: *todos os direitos reservados*.
+**O código deste repositório está sob a Licença Apache 2.0** (arquivo
+[`LICENSE`](LICENSE)). As fontes tipográficas mantêm a SIL Open Font License,
+e o firmware AR488 e a documentação da Agilent/Keysight seguem as licenças
+dos seus autores.
